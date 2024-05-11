@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Summarizer</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Document Summarizer</h1>
+        <form id="summarize-form" action="/summarize" method="post" enctype="multipart/form-data">
+            <label for="file">Upload PDF:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required><br>
+
+            <label for="custom_prompt">Custom Prompt:</label>
+            <input type="text" id="custom_prompt" name="custom_prompt" value="Summarize the following document" required><br>
+
+            <label for="chunk_size">Chunk Size:</label>
+            <input type="number" id="chunk_size" name="chunk_size" value="2000" required><br>
+
+            <label for="chunk_overlap">Chunk Overlap:</label>
+            <input type="number" id="chunk_overlap" name="chunk_overlap" value="200" required><br>
+
+            <label for="chain_type">Chain Type:</label>
+            <select id="chain_type" name="chain_type" required>
+                <option value="map_reduce">Map Reduce</option>
+                <option value="stuff">Stuff</option>
+                <option value="refine">Refine</option>
+            </select><br>
+
+            <label for="num_summaries">Number of Summaries:</label>
+            <input type="number" id="num_summaries" name="num_summaries" value="1" required><br>
+
+            <label for="temperature">Temperature:</label>
+            <input type="number" step="0.1" id="temperature" name="temperature" value="0.5" required><br>
+
+            <label for="model_name">Model Name:</label>
+            <select id="model_name" name="model_name" required>
+                <option value="ChatGPT">ChatGPT</option>
+                <option value="GPT-4">GPT-4</option>
+            </select><br>
+
+            <button type="submit">Summarize</button>
+        </form>
+
+        <div id="summaries"></div>
+
+        <div id="question-container" style="display: none;">
+            <h2>Ask a Question</h2>
+            <form id="ask-form" action="/ask" method="post">
+                <label for="question">Question:</label>
+                <input type="text" id="question" name="question" required><br>
+                <button type="submit">Ask</button>
+            </form>
+            <div class="answers" id="answers"></div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('#summarize-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/summarize', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            const summariesDiv = document.getElementById('summaries');
+            summariesDiv.innerHTML = result.summaries.map(summary => `<p>${summary}</p>`).join('');
+            document.getElementById('question-container').style.display = 'block';
+        };
+
+        document.querySelector('#ask-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/ask', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            const answersDiv = document.getElementById('answers');
+            const newAnswer = document.createElement('div');
+            newAnswer.className = 'answer';
+            newAnswer.textContent = result.answer;
+            answersDiv.appendChild(newAnswer);
+        };
+    </script>
+</body>
+</html>
