@@ -2,6 +2,9 @@
 
 This project is a web-based application for summarizing PDF documents using advanced language models. The application is built with Streamlit and utilizes the Hugging Face Transformers library for model loading and inference. The summarizer supports custom prompts and allows users to ask questions about the document after summarizing it.
 
+
+For code/accessing application, go to - https://huggingface.co/spaces/nikhil16kulkarni/document-summarizer
+
 ## Table of Contents
 
 - [Features](#features)
